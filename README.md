@@ -1,7 +1,7 @@
 # Storprojekt20
 Storprojekt 2020 Webbserverprogrammering.
 
-![Begin](begin.png)
+![begin](begin.png)
 
 ##  Uppgiftsbeskrivning
 
@@ -12,7 +12,7 @@ Du kommer även under arbetets gång få miniföreläsningar om hur du kan göra
 ##  Specifikation
 - Valfri applikation, tex webbshop, forum, föreningssida med användare, företagssida med olika användare...
 - Individuellt projekt
-- Forka grundrepo: https://github.com/itggot-emil-willbas/slutprojektwsp21
+- Forka grundrepo: https://github.com/itggot/slutprojektWSP21
 - Utvecklingsdagbok i github wikin (skrivs varje tillfälle)
 - CSS är inget krav men är uppmuntrat
 - Inlämningar v.9 (för feedback, avstämning), 16 (slutinlämning)
@@ -26,3 +26,6 @@ Du kommer även under arbetets gång få miniföreläsningar om hur du kan göra
 ## Lektionsplanering
 
 ![tid](tid.png)
+
+
+
