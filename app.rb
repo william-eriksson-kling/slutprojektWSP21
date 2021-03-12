@@ -19,36 +19,49 @@ post("/login") do
 
   if BCrypt::Password.new(pwdigest) == password
     session[:id] = id
-    redirect('/day')
+    redirect('/days')
   else
-    "Wrond password"
+    "Wrong password"
 end
 
-get('/day') do 
+get('/days') do 
     id = session[:id].to_i
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM todos WHERE user_id = ?",id)
-    slim(:"day/index", locals:{todos:result})
+    slim(:"days/index", locals:{todos:result})
 end
 
-get('/day/new') do
-  slim(:"day/new")
+get('/days/new') do
+  slim(:"days/new")
 end
 
-post('/day/new') do
+post('/days/new') do
   day = params[:dag]
   teamid = params[:team_id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.execute("INSERT INTO day VALUES (date,team_id)", day, teamid)
-  redirect('/day')
+  redirect('/days')
 end
 
-post('/todo/new') do
+post('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.execute("INSERT INTO to_do VALUES (date,type,description )", datum, kategori, beskrivning)
-  redirect('/day')
+  redirect('/days')
+end
+
+
+
+
+
+
+get('/days/:id') do
+  # Gör så att todos under samma dag visas i en lista
+  id = params[:id].to_i
+  db = SQLite3::Database.new("db/chinook-crud.db")
+  db.results_as_hash = true
+  slim(:"days/show")
 end
