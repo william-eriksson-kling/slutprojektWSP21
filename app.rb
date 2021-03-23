@@ -5,7 +5,23 @@ require 'bcrypt'
 require_relative './model.rb'
 
 get('/') do
-  slim(:login)
+  slim(:"days/index")
+  #SKa vara "users/login"
+end
+
+post('/users/new')
+  username = params[:username]
+  password = params[:password]
+  confirm_password = params[:confirm_password]
+
+  if password == confirm_password
+    password_correct = BCrypt::Password.create(password)
+    db = SQLite3::Database.new('db/slutprojekt.db')
+    db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_correct)
+    redirect('/login')
+  else
+    "The password don't match"
+  end
 end
 
 post("/login") do
@@ -23,12 +39,13 @@ post("/login") do
   else
     "Wrong password"
 end
+end
 
 get('/days') do 
     id = session[:id].to_i
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM todos WHERE user_id = ?",id)
+    result = db.execute("SELECT * FROM to_do WHERE id = ?",id)
     slim(:"days/index", locals:{todos:result})
 end
 
