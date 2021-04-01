@@ -78,6 +78,7 @@ end
 get('/days/:id') do
   # Gör så att todos under samma dag visas i en lista
   id = params[:id].to_i
+  todos = params[:todos]
   db = SQLite3::Database.new("db/chinook-crud.db")
   db.results_as_hash = true
   slim(:"days/show")

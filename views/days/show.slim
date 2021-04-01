@@ -1,7 +1,9 @@
 h1 #{days["date"]}
 
 ol 
-    -   todos.each do |todo|
-            li
-                p #{todo["type"]}
-                p #{todo["description"]}
+    -   id.each do |day|
+            ol    
+                -   todos.each do |todo|
+                    li
+                        p #{todo["type"]}
+                        p #{todo["description"]}
