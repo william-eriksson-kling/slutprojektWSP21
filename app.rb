@@ -9,7 +9,7 @@ get('/') do
   #SKa vara "users/login"
 end
 
-post('/users/new')
+post('/users/new') do
   username = params[:username]
   password = params[:password]
   confirm_password = params[:confirm_password]
@@ -23,6 +23,8 @@ post('/users/new')
     "The password don't match"
   end
 end
+
+
 
 post("/login") do
   username = params[:username]
@@ -45,8 +47,12 @@ get('/days') do
     id = session[:id].to_i
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM to_do WHERE id = ?",id)
-    slim(:"days/index", locals:{todos:result})
+    result = db.execute("SELECT * FROM day WHERE user = ?",id)
+    slim(:"days/index", locals:{day:result})
+end
+
+get('/days/:id') do
+  
 end
 
 get('/days/new') do
@@ -55,9 +61,9 @@ end
 
 post('/days/new') do
   day = params[:dag]
-  teamid = params[:team_id].to_i
+  user_id = session[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
-  db.execute("INSERT INTO day VALUES (date,team_id)", day, teamid)
+  db.execute("INSERT INTO day VALUES (date,user)", day, user_id)
   redirect('/days')
 end
 
@@ -66,7 +72,8 @@ post('/todos/new') do
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
   db = SQLite3::Database.new("db/slutprojekt.db")
-  db.execute("INSERT INTO to_do VALUES (date,type,description )", datum, kategori, beskrivning)
+  db.execute("INSERT INTO to_do VALUES (date,type,description)", datum, kategori, beskrivning)
+  db.execute("INSERT INTO to_do - day VALUES (day_id,to_do_id)", kategori, datum)
   redirect('/days')
 end
 
