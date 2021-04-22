@@ -1,8 +1,8 @@
 h2 Schema för dagar 
 
 ol
-    -   date.each do |days|
+    -   day.each do |days|
             li 
-                a href="days/#{days["id"]}" 
-                p #{days["date"]}
+                a href="days/#{days["id"]}" #{days["date"]}
+                
         

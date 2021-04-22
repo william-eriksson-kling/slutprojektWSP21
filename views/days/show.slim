@@ -1,9 +1,10 @@
 h1 #{days["date"]}
 
-ol 
-    -   id.each do |day|
-            ol    
-                -   todos.each do |todo|
-                    li
-                        p #{todo["type"]}
-                        p #{todo["description"]}
+ol    
+    -   todos.each do |todo|
+            li
+                p Typ av syssla: #{todo["type"]}
+                p Beskrivning: #{todo["description"]}
+                p Datum: #{todo["date"]}
+                form method="POST" action="days/#{todo['id']}/delete"
+                 input type="submit" value="Delete"

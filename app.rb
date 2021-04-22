@@ -6,7 +6,7 @@ require_relative './model.rb'
 
 get('/') do
   slim(:"days/index")
-  #SKa vara "users/login"
+  #Ska vara "users/login"
 end
 
 post('/users/new') do
@@ -47,13 +47,11 @@ get('/days') do
     id = session[:id].to_i
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM day WHERE user = ?",id)
-    slim(:"days/index", locals:{day:result})
+    result = db.execute("SELECT * FROM day")
+    # WHERE user = ?,id
+    slim(:"days/index",locals:{day:result})
 end
 
-get('/days/:id') do
-  
-end
 
 get('/days/new') do
   slim(:"days/new")
@@ -67,26 +65,30 @@ post('/days/new') do
   redirect('/days')
 end
 
+
 post('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.execute("INSERT INTO to_do VALUES (date,type,description)", datum, kategori, beskrivning)
-  db.execute("INSERT INTO to_do - day VALUES (day_id,to_do_id)", kategori, datum)
+  db.execute("INSERT INTO to_do-day VALUES (day_id,to_do_id)", kategori, datum)
   redirect('/days')
 end
 
-
-
-
-
+post('/days/:id/delete') do
+  id = params[:id].to_i
+  db = SQLite3::Database.new("db/slutprojekt.db")
+  db.execute("DELETE FROM to_do WHERE id = ?",id)
+  redirect('/days')
+end
 
 get('/days/:id') do
   # Gör så att todos under samma dag visas i en lista
   id = params[:id].to_i
-  todos = params[:todos]
-  db = SQLite3::Database.new("db/chinook-crud.db")
+  db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
-  slim(:"days/show")
+  todos = db.execute("SELECT to_do_id FROM to_do-day WHERE day_id = ? ", id)
+  todo1 = db.execute("SELECT * FROM to_do WHERE id = ?", todos)
+  slim(:"days/show", locals:{todos:todo1})
 end
