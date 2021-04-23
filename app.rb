@@ -2,7 +2,8 @@ require 'sinatra'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
-require_relative './model.rb'
+
+enable :sessions
 
 get('/') do
   slim(:"days/index")
@@ -24,7 +25,9 @@ post('/users/new') do
   end
 end
 
-
+get('/showlogin') do
+  slim(:login)
+end
 
 post("/login") do
   username = params[:username]
@@ -42,6 +45,8 @@ post("/login") do
     "Wrong password"
 end
 end
+
+
 
 get('/days') do 
     id = session[:id].to_i
@@ -61,18 +66,19 @@ post('/days/new') do
   day = params[:dag]
   user_id = session[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
-  db.execute("INSERT INTO day VALUES (date,user)", day, user_id)
+  db.execute("INSERT INTO day (date,user) VALUES (?,?) ", day, user_id)
   redirect('/days')
 end
 
 
-post('/todos/new') do
+get('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
   db = SQLite3::Database.new("db/slutprojekt.db")
-  db.execute("INSERT INTO to_do VALUES (date,type,description)", datum, kategori, beskrivning)
-  db.execute("INSERT INTO to_do-day VALUES (day_id,to_do_id)", kategori, datum)
+  db.results_as_hash = true
+  db.execute("INSERT INTO to_do (date,type,description) VALUES (?,?,?) ", datum, kategori, beskrivning)
+  db.execute("INSERT INTO to_do_day (day_id,to_do_id) VALUES (?,?) ", kategori, datum)
   redirect('/days')
 end
 
@@ -88,7 +94,7 @@ get('/days/:id') do
   id = params[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
-  todos = db.execute("SELECT to_do_id FROM to_do-day WHERE day_id = ? ", id)
+  todos = db.execute("SELECT to_do_id FROM to_do_day WHERE day_id = ? ", id)
   todo1 = db.execute("SELECT * FROM to_do WHERE id = ?", todos)
   slim(:"days/show", locals:{todos:todo1})
 end
