@@ -70,15 +70,18 @@ post('/days/new') do
   redirect('/days')
 end
 
-
 get('/todos/new') do
+  slim(:"todos/new")
+end
+
+post('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
   db.execute("INSERT INTO to_do (date,type,description) VALUES (?,?,?) ", datum, kategori, beskrivning)
-  db.execute("INSERT INTO to_do_day (day_id,to_do_id) VALUES (?,?) ", kategori, datum)
+  db.execute("INSERT INTO to_do_day (day_id,to_do_id) VALUES (?,?) ", datum, kategori)
   redirect('/days')
 end
 
@@ -94,7 +97,8 @@ get('/days/:id') do
   id = params[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
-  todos = db.execute("SELECT to_do_id FROM to_do_day WHERE day_id = ? ", id)
-  todo1 = db.execute("SELECT * FROM to_do WHERE id = ?", todos)
+  datum1 = db.execute("SELECT date FROM day WHERE id =?", id)
+  todos = db.execute("SELECT to_do_id FROM to_do_day WHERE day_id = ?", datum1)
+  todo1 = db.execute("SELECT * FROM to_do WHERE type = ?", todos)
   slim(:"days/show", locals:{todos:todo1})
 end
