@@ -10,6 +10,10 @@ get('/') do
   #Ska vara "users/login"
 end
 
+get('/users/new') do
+  slim(:"users/register")
+end
+
 post('/users/new') do
   username = params[:username]
   password = params[:password]
@@ -19,17 +23,17 @@ post('/users/new') do
     password_correct = BCrypt::Password.create(password)
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_correct)
-    redirect('/login')
+    redirect('/showlogin')
   else
     "The password don't match"
   end
 end
 
 get('/showlogin') do
-  slim(:login)
+  slim(:"users/login")
 end
 
-post("/login") do
+post("/users/login") do
   username = params[:username]
   password = params[:password]
   db = SQLite3::Database.new('db/slutprojekt.db')
