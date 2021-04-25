@@ -6,5 +6,5 @@ ol
                 p Typ av syssla: #{todo["type"]}
                 p Beskrivning: #{todo["description"]}
                 p Datum: #{todo["date"]}
-                form method="POST" action="days/#{todo['id']}/delete"
+                form method="POST" action="#{todo['id']}/delete"
                  input type="submit" value="Delete"

@@ -23,13 +23,13 @@ post('/users/new') do
     password_correct = BCrypt::Password.create(password)
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_correct)
-    redirect('/showlogin')
+    redirect('/login')
   else
     "The password don't match"
   end
 end
 
-get('/showlogin') do
+get('/login') do
   slim(:"users/login")
 end
 
@@ -101,8 +101,7 @@ get('/days/:id') do
   id = params[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
-  datum1 = db.execute("SELECT date FROM day WHERE id =?", id)
-  todos = db.execute("SELECT to_do_id FROM to_do_day WHERE day_id = ?", datum1)
-  todo1 = db.execute("SELECT * FROM to_do WHERE type = ?", todos)
+  datum = db.execute("SELECT date FROM day WHERE id =? ", id).to_s
+  todo1 = db.execute("SELECT * FROM to_do WHERE date = ?", datum)
   slim(:"days/show", locals:{todos:todo1})
 end
