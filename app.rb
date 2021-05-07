@@ -19,13 +19,20 @@ post('/users/new') do
   password = params[:password]
   confirm_password = params[:confirm_password]
 
+  username_answer = username.chomp.scan(/\D/).empty?
+  
+  if username_answer == false
+    "Skriv in ett användarnamn"
+  end
+
+
   if password == confirm_password
     password_correct = BCrypt::Password.create(password)
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_correct)
     redirect('/login')
   else
-    "The password don't match"
+    "Lösenord matchar inte"
   end
 end
 
@@ -46,7 +53,7 @@ post("/users/login") do
     session[:id] = id
     redirect('/days')
   else
-    "Wrong password"
+    "Fel lösenord"
 end
 end
 
@@ -56,7 +63,7 @@ get('/days') do
     id = session[:id].to_i
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.results_as_hash = true
-    result = db.execute("SELECT * FROM day")
+    result = db.execute("SELECT * FROM day WHERE user = ?", id)
     # WHERE user = ?,id
     slim(:"days/index",locals:{day:result})
 end
@@ -70,8 +77,9 @@ post('/days/new') do
   day = params[:dag]
 
   if day == nil
-    p "Skriv in ett datum för ny dag"
+    "Skriv in ett datum för ny dag"
   end
+
   user_id = session[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.execute("INSERT INTO day (date,user) VALUES (?,?) ", day, user_id)
@@ -86,18 +94,6 @@ post('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
-
-  if datum == nil
-    p "Skriv in ett datum för nytt TODO"
-  end
-
-  if kategori == nil
-    p "Skriv in ett namn/kategori på TODO"
-  end
-  
-  if beskrivning == nil
-    p "Skriv in en beskrivning för TODO"
-  end
   
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
