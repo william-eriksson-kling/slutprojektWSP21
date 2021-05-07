@@ -21,7 +21,7 @@ post('/users/new') do
 
   username_answer = username.chomp.scan(/\D/).empty?
   
-  if username_answer == false
+  if username_answer =! true
     "Skriv in ett användarnamn"
   end
 
@@ -49,12 +49,19 @@ post("/users/login") do
   pwdigest = result["password"]
   id = result["id"]
 
+  username_answer = username.scan(/\D/).empty?
+
+  if username_answer == true
+    p "Skriv in ett användarnamn"
+  end
+
+
   if BCrypt::Password.new(pwdigest) == password
     session[:id] = id
     redirect('/days')
   else
     "Fel lösenord"
-end
+  end
 end
 
 
