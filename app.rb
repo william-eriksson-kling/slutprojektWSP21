@@ -6,7 +6,7 @@ require 'bcrypt'
 enable :sessions
 
 get('/') do
-  slim(:"days/index")
+  slim(:"users/login")
   #Ska vara "users/login"
 end
 
