@@ -68,6 +68,10 @@ end
 
 post('/days/new') do
   day = params[:dag]
+
+  if day == nil
+    p "Skriv in ett datum för ny dag"
+  end
   user_id = session[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.execute("INSERT INTO day (date,user) VALUES (?,?) ", day, user_id)
@@ -82,6 +86,19 @@ post('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
   beskrivning = params[:beskrivning]
+
+  if datum == nil
+    p "Skriv in ett datum för nytt TODO"
+  end
+
+  if kategori == nil
+    p "Skriv in ett namn/kategori på TODO"
+  end
+  
+  if beskrivning == nil
+    p "Skriv in en beskrivning för TODO"
+  end
+  
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true
   db.execute("INSERT INTO to_do (date,type,description) VALUES (?,?,?) ", datum, kategori, beskrivning)
