@@ -2,8 +2,11 @@ require 'sinatra'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
+require_relative './model.rb'
 
 enable :sessions
+
+include Model
 
 get('/') do
   slim(:"users/login")
@@ -19,12 +22,13 @@ post('/users/new') do
   password = params[:password]
   confirm_password = params[:confirm_password]
 
-  username_answer = username.chomp.scan(/\D/).empty?
-  
-  if username_answer =! true
-    "Skriv in ett användarnamn"
-  end
 
+  no_username(username)
+  #username_answer = username.chomp.scan(/\D/).empty?
+  
+  #if username_answer =! true
+    #"Skriv in ett användarnamn"
+  #end
 
   if password == confirm_password
     password_correct = BCrypt::Password.create(password)
@@ -43,49 +47,59 @@ end
 post("/users/login") do
   username = params[:username]
   password = params[:password]
+
+  no_username(username)
+
   db = SQLite3::Database.new('db/slutprojekt.db')
   db.results_as_hash = true
   result = db.execute("SELECT * From users WHERE username = ?",username).first
   pwdigest = result["password"]
   id = result["id"]
 
-  username_answer = username.scan(/\D/).empty?
+  check_password(BCrypt::Password.new(pwdigest), password, id)
+ #if BCrypt::Password.new(pwdigest) == password
+    #session[:id] = id
+    #redirect('/days')
+  #else
+    #"Fel lösenord"
+  #end
 
-  if username_answer == true
-    p "Skriv in ett användarnamn"
-  end
-
-
-  if BCrypt::Password.new(pwdigest) == password
-    session[:id] = id
-    redirect('/days')
-  else
-    "Fel lösenord"
-  end
 end
 
 
 
 get('/days') do 
+
+
+  not_logged_in(session[:id])
+  #if session[:id] == nil 
+    #"Du måste logga in för att se dagar"
+    #redirect('/login')
+  #end
+
     id = session[:id].to_i
     db = SQLite3::Database.new('db/slutprojekt.db')
     db.results_as_hash = true
     result = db.execute("SELECT * FROM day WHERE user = ?", id)
     # WHERE user = ?,id
     slim(:"days/index",locals:{day:result})
+
 end
 
 
 get('/days/new') do
+  not_logged_in(session[:id])
   slim(:"days/new")
 end
 
 post('/days/new') do
   day = params[:dag]
 
-  if day == nil
-    "Skriv in ett datum för ny dag"
-  end
+  no_day(day)
+
+  #if day == nil
+    #"Skriv in ett datum för ny dag"
+  #end
 
   user_id = session[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
@@ -94,6 +108,7 @@ post('/days/new') do
 end
 
 get('/todos/new') do
+  not_logged_in(session[:id])
   slim(:"todos/new")
 end
 
@@ -117,6 +132,7 @@ post('/days/:id/delete') do
 end
 
 get('/days/:id') do
+  not_logged_in(session[:id])
   # Gör så att todos under samma dag visas i en lista
   id = params[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
