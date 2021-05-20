@@ -8,46 +8,67 @@ enable :sessions
 
 include Model
 
+# Display Landing Page
+#
 get('/') do
   slim(:"users/login")
   #Ska vara "users/login"
 end
 
+# Displays a register form
+#
 get('/users/new') do
   slim(:"users/register")
 end
 
+# Attempts login and updates the session
+#
+# @param [String] username, the username of the user
+# @param [String] password, the password of the user
+# @param [String] confirm_password, the confirmation of the password
+#
+# @see Model#confirm_password
+#
 post('/users/new') do
   username = params[:username]
   password = params[:password]
   confirm_password = params[:confirm_password]
   
-  
+  # Return om username är tom
   if username == ""
     return "Skriv in ett användarnamn"
   end
 
+  # Return om password och confirm_password inte matchar
   confirm_password(password, confirm_password, username)
-  # if password == confirm_password
-  #   password_correct = BCrypt::Password.create(password)
-  #   db = SQLite3::Database.new('db/slutprojekt.db')
-  #   db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_correct)
-  #   redirect('/login')
-  # else
-  #   "Lösenord matchar inte"
-  # end
+  
+  #if password == confirm_password
+    #password_correct = BCrypt::Password.create(password)
+    #db = SQLite3::Database.new('db/slutprojekt.db')
+    #db.execute("INSERT INTO users (username,password) VALUES (?,?)",username,password_correct)
+    #redirect('/login')
+  #else
+    #"Lösenord matchar inte"
+  #end
 
 end
 
+# Displays a login form
+#
 get('/login') do
   slim(:"users/login")
 end
 
+# Attempts login and updates the session
+# 
+# @param [String] username, the username of the user
+# @param [String] password, the password of the user
+#
+# @see Model#check_password
+#
 post("/users/login") do
   username = params[:username]
   password = params[:password]
-
-  
 
   db = SQLite3::Database.new('db/slutprojekt.db')
   db.results_as_hash = true
@@ -55,6 +76,7 @@ post("/users/login") do
 
   #Felmeddelanden:
 
+  # Return om username och password inte matchar
   if result == nil
     return "Användarnamn och lösenord matchar inte"  
   else
@@ -62,12 +84,15 @@ post("/users/login") do
     id = result["id"]
   end
 
+  # Return om username är tom
   if username == ""
     return "Skriv in ett användarnamn"
   end
 
+  # Return om password och pwdigest inte matchar
   check_password(BCrypt::Password.new(pwdigest), password, id)
- #if BCrypt::Password.new(pwdigest) == password
+ 
+  #if BCrypt::Password.new(pwdigest) == password
     #session[:id] = id
     #redirect('/days')
   #else
@@ -76,8 +101,8 @@ post("/users/login") do
 
 end
 
-
-
+# Displays a list of days
+#
 get('/days') do 
 
 
@@ -91,12 +116,13 @@ get('/days') do
   db = SQLite3::Database.new('db/slutprojekt.db')
   db.results_as_hash = true
   result = db.execute("SELECT * FROM day WHERE user = ?", id)
-  # WHERE user = ?,id
+  #WHERE user = ?,id
   slim(:"days/index",locals:{day:result})
 
 end
 
-
+# Displays a new-day form
+# 
 get('/days/new') do
   if session[:id] == nil 
     return "Du måste logga in för att använda denna funktion"
@@ -105,9 +131,16 @@ get('/days/new') do
   slim(:"days/new")
 end
 
+# Creates a new day and redirects to '/days'
+#
+# @param [String] day, the date of the day
+#
+# @see Model#no_day
+#
 post('/days/new') do
   day = params[:dag]
 
+  # Return om day är tom
   no_day(day)
 
   #if day == nil
@@ -120,6 +153,8 @@ post('/days/new') do
   redirect('/days')
 end
 
+# Displays a new-todo form
+#
 get('/todos/new') do
   if session[:id] == nil 
     return "Du måste logga in för att använda denna funktion"
@@ -128,6 +163,12 @@ get('/todos/new') do
   slim(:"todos/new")
 end
 
+# Creates a new todo and redirects to '/days'
+#
+# @param [String] datum, the date of the todo
+# @param [String] kategori, the type of the todo
+# @param [String] beskrivning, the description of the todo
+#
 post('/todos/new') do
   datum = params[:datum]
   kategori = params[:kategori]
@@ -140,6 +181,10 @@ post('/todos/new') do
   redirect('/days')
 end
 
+# Deletes an existing day and redirects to '/days'
+#
+# @param [String] id, the id of the day
+#
 post('/days/:id/delete') do
   id = params[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
@@ -147,11 +192,13 @@ post('/days/:id/delete') do
   redirect('/days')
 end
 
+# Displays a single day
+#
 get('/days/:id') do
   if session[:id] == nil 
     return "Du måste logga in för att använda denna funktion"
   end
-  # Gör så att todos under samma dag visas i en lista
+  #Gör så att todos under samma dag visas i en lista
   id = params[:id].to_i
   db = SQLite3::Database.new("db/slutprojekt.db")
   db.results_as_hash = true

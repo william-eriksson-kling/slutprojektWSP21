@@ -1,10 +1,10 @@
 
 module Model
-    # def no_username(username)
-    #     if username == ""
-    #         return "Skriv in ett användarnamn"
-    #     end
-    # end
+    #def no_username(username)
+        #if username == ""
+            #return "Skriv in ett användarnamn"
+        #end
+    #end
 
     def no_day(day)
         if day == nil
