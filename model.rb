@@ -1,5 +1,5 @@
 
-
+module Model
     # def no_username(username)
     #     if username == ""
     #         return "Skriv in ett användarnamn"
@@ -38,4 +38,4 @@
         end
     end
     
-
+end

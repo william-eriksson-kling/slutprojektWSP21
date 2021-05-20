@@ -6,7 +6,7 @@ require_relative './model.rb'
 
 enable :sessions
 
-
+include Model
 
 get('/') do
   slim(:"users/login")
@@ -54,7 +54,7 @@ post("/users/login") do
   result = db.execute("SELECT * From users WHERE username = ?",username).first
 
   #Felmeddelanden:
-  
+
   if result == nil
     return "Användarnamn och lösenord matchar inte"  
   else
