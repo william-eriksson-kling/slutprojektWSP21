@@ -53,6 +53,8 @@ post("/users/login") do
   db.results_as_hash = true
   result = db.execute("SELECT * From users WHERE username = ?",username).first
 
+  #Felmeddelanden:
+  
   if result == nil
     return "Användarnamn och lösenord matchar inte"  
   else
